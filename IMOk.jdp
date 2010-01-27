@@ -5,7 +5,7 @@
 # It SHOULD NOT BE modified manually.
 #
 AddOn=0
-AlwaysBuild=0
+AlwaysBuild=1
 [AlxImports
 ]
 AutoRestart=0

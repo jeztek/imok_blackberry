@@ -22,6 +22,8 @@ AutoRestart=0
 ExcludeFromBuildAll=0
 [Files
 src\com\jeztek\imok\IMOk.java
+src\com\jeztek\imok\IMOkScreen.java
+src\com\jeztek\imok\IMOkSMS.java
 ]
 HaveAlxImports=0
 HaveDefs=0

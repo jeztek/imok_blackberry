@@ -28,11 +28,9 @@ public class IMOkScreen extends MainScreen {
 		ButtonField okButton = new ButtonField("I'm Ok");
 		okButton.setChangeListener(new FieldChangeListener() {
 			public void fieldChanged(Field field, int context) {
-				IMOkSMS sms = new IMOkSMS();
-				if (sms.sendSMS("sms://6505555555", "Test!"))
-					mStatusLabel.setText("Reported");
-				else
-					mStatusLabel.setText("Error");
+				IMOkSMS sms = new IMOkSMS("sms://6507931323", "Test!");
+				sms.send();
+				mStatusLabel.setText("Reported");
 			}
 		});
 
@@ -80,7 +78,6 @@ public class IMOkScreen extends MainScreen {
 	}
 	
 	public boolean onClose() {
-		Dialog.alert("Goodbye!");
 		System.exit(0);
 		return true;
 	}

@@ -8,25 +8,35 @@ import javax.wireless.messaging.TextMessage;
 
 public class IMOkSMS {
 	
-	public boolean sendSMS(String address, String message) {
-		
-		return true;
-		/*
-		MessageConnection smsConnection = null;
-		try {
-			smsConnection = (MessageConnection)Connector.open(address);
-			
-			TextMessage textMessage = (TextMessage)smsConnection.newMessage(MessageConnection.TEXT_MESSAGE);
-			textMessage.setAddress(address);
-			textMessage.setPayloadText(message);
+	private String mAddress;
+	private String mMessage;
+	
+	private Thread mSMSThread;
+	private Runnable mSMSTask = new Runnable() {
+		public void run() {
+			MessageConnection smsConnection = null;
+			try {
+				smsConnection = (MessageConnection)Connector.open(mAddress);
+				
+				TextMessage textMessage = (TextMessage)smsConnection.newMessage(MessageConnection.TEXT_MESSAGE);
+				textMessage.setAddress(mAddress);
+				textMessage.setPayloadText(mMessage);
 
-			smsConnection.send(textMessage);
-			smsConnection.close();
-			return true;
+				smsConnection.send(textMessage);
+				smsConnection.close();
+			}
+			catch (IOException e) {
+			}
 		}
-		catch (IOException e) {
-			return false;
-		}	
-		*/	
+	};
+	
+	public IMOkSMS(String address, String message) {
+		mAddress = address;
+		mMessage = message;
+	}
+
+	public void send() {
+		mSMSThread = new Thread(mSMSTask);
+		mSMSThread.start();
 	}
 }

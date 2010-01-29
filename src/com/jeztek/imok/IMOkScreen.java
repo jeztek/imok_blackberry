@@ -39,8 +39,6 @@ public class IMOkScreen extends MainScreen {
 		};
 		okButton.setChangeListener(new FieldChangeListener() {
 			public void fieldChanged(Field field, int context) {
-				mMessageEdit.setText("I'm OK!");	
-			}
 		});
 		okButton.setFont(okButton.getFont().derive(Font.PLAIN, 30));
 
@@ -144,7 +142,6 @@ public class IMOkScreen extends MainScreen {
 	}
 	
 	public boolean onClose() {
-		Dialog.alert("Goodbye!");
 		System.exit(0);
 		return true;
 	}

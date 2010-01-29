@@ -1,15 +1,18 @@
 package com.jeztek.imok;
 
+import net.rim.device.api.system.Bitmap;
 import net.rim.device.api.ui.Field;
 import net.rim.device.api.ui.FieldChangeListener;
+import net.rim.device.api.ui.Font;
+import net.rim.device.api.ui.Graphics;
 import net.rim.device.api.ui.MenuItem;
 import net.rim.device.api.ui.component.BasicEditField;
 import net.rim.device.api.ui.component.ButtonField;
 import net.rim.device.api.ui.component.Dialog;
 import net.rim.device.api.ui.component.LabelField;
 import net.rim.device.api.ui.component.Menu;
-import net.rim.device.api.ui.component.RichTextField;
 import net.rim.device.api.ui.component.SeparatorField;
+import net.rim.device.api.ui.container.HorizontalFieldManager;
 import net.rim.device.api.ui.container.MainScreen;
 
 public class IMOkScreen extends MainScreen {
@@ -19,32 +22,76 @@ public class IMOkScreen extends MainScreen {
 	private LabelField mStatusLabel;
 	private BasicEditField mMessageEdit;
 	private LabelField mCharCountLabel;
+	private HorizontalFieldManager mOKButtonsManager;
 	
 	public IMOkScreen() {
 		super();
 		setTitle(new LabelField("IMOk", LabelField.ELLIPSIS | LabelField.USE_ALL_WIDTH));
 		
-		mStatusLabel = new LabelField();
-		ButtonField okButton = new ButtonField("I'm Ok");
+		// I'm OK button
+		ButtonField okButton = new ButtonField("I'm OK", Field.FIELD_HCENTER) {
+			public int getPreferredHeight() {
+				return 50;
+			}
+			public int getPreferredWidth() {
+				return 150;
+			}
+		};
 		okButton.setChangeListener(new FieldChangeListener() {
 			public void fieldChanged(Field field, int context) {
-				IMOkSMS sms = new IMOkSMS();
-				if (sms.sendSMS("sms://6505555555", "Test!"))
-					mStatusLabel.setText("Reported");
-				else
-					mStatusLabel.setText("Error");
+				mMessageEdit.setText("I'm OK!");	
 			}
 		});
+		okButton.setFont(okButton.getFont().derive(Font.PLAIN, 30));
 
-		ButtonField cancelButton = new ButtonField("Cancel");
-		cancelButton.setChangeListener(new FieldChangeListener() {
+		// Spacer
+		LabelField btwnButtons = new LabelField() {
+			public int getPreferredWidth() {
+				return 10;
+			}
+		};
+		
+		
+		// I Need Help button
+		ButtonField helpButton = new ButtonField("I Need Help", Field.FIELD_HCENTER) {
+			public int getPreferredHeight() {
+				return 50;
+			}
+			public int getPreferredWidth() {
+				return 150;
+			}
+		};
+		helpButton.setChangeListener(new FieldChangeListener() {
 			public void fieldChanged(Field field, int context) {
-				mStatusLabel.setText("Cancelled");
+				mMessageEdit.setText("I need help!");	
 			}
 		});
+		helpButton.setFont(helpButton.getFont().derive(Font.PLAIN, 30));
+		
+		mOKButtonsManager = new HorizontalFieldManager(Field.FIELD_HCENTER);
+		mOKButtonsManager.add(okButton);
+		mOKButtonsManager.add(btwnButtons);
+		mOKButtonsManager.add(helpButton);
+		
 		
 		mCharCountLabel = new LabelField(Integer.toString(MAX_SMS_LEN));
-		mMessageEdit = new BasicEditField();
+		mMessageEdit = new BasicEditField("", "", MAX_SMS_LEN, Field.FIELD_HCENTER) {
+			public int getPreferredWidth() {
+				return 500;
+			}
+			public int getPreferredHeight() {
+				return 50;
+			}
+            public void paint(Graphics g) {
+                super.paint(g);
+                g.drawRect(0, 0, getWidth(), getHeight());
+            }
+			protected void layout(int width, int height)
+			{
+				// limit to the half of available space 
+				super.layout((int)(width * .8), height);
+			}
+		};
 		mMessageEdit.setChangeListener(new FieldChangeListener() {
 			public void fieldChanged(Field field, int context) {
 				int messageLen = MAX_SMS_LEN - mMessageEdit.getTextLength();
@@ -52,14 +99,31 @@ public class IMOkScreen extends MainScreen {
 			}
 		});
 		
-		add(new RichTextField("Are you okay?"));
-		add(mStatusLabel);
-		add(new SeparatorField());
-		add(okButton);
-		add(cancelButton);
-		add(new SeparatorField());
+		
+		// Send button
+		ButtonField sendButton = new ButtonField("Send", Field.FIELD_HCENTER) {
+			public int getPreferredHeight() {
+				return 30;
+			}
+			public int getPreferredWidth() {
+				return 100;
+			}
+		};
+		sendButton.setChangeListener(new FieldChangeListener() {
+			public void fieldChanged(Field field, int context) {
+			}
+		});
+		sendButton.setFont(helpButton.getFont().derive(Font.PLAIN, 30));
+		
+		
+		
+		add(new LabelField());
+		add(mOKButtonsManager);
+		add(new LabelField());
+
 		add(mMessageEdit);
 		add(mCharCountLabel);
+		add(sendButton);
 	}
 	
 	protected void makeMenu(Menu menu, int instance) {
@@ -85,4 +149,3 @@ public class IMOkScreen extends MainScreen {
 		return true;
 	}
 }
-

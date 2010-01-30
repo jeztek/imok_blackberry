@@ -24,6 +24,7 @@ ExcludeFromBuildAll=0
 src\com\jeztek\imok\IMOk.java
 src\com\jeztek\imok\IMOkScreen.java
 src\com\jeztek\imok\IMOkSMS.java
+src\com\jeztek\imok\MessageScreen.java
 ]
 HaveAlxImports=0
 HaveDefs=0

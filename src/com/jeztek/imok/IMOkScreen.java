@@ -6,6 +6,7 @@ import net.rim.device.api.ui.Font;
 import net.rim.device.api.ui.Graphics;
 import net.rim.device.api.ui.MenuItem;
 import net.rim.device.api.ui.component.AutoTextEditField;
+import net.rim.device.api.ui.component.BasicEditField;
 import net.rim.device.api.ui.component.ButtonField;
 import net.rim.device.api.ui.component.Dialog;
 import net.rim.device.api.ui.component.LabelField;
@@ -21,9 +22,13 @@ public class IMOkScreen extends MainScreen {
 	private static final String IMOK_MSG = "I'm okay.";
 	private static final String HELP_MSG = "I need help!";
 	
-	private AutoTextEditField mMessageEdit;
+	private static boolean mIsOkay;
+	private static boolean mIsMessageEdited = false;
+	
+	private BasicEditField mMessageEdit;
 	private LabelField mCharCountLabel;
 	private HorizontalFieldManager mOKButtonsManager;
+	private LabelField mOKStatusField;
 	
 	public IMOkScreen() {
 		super();
@@ -42,7 +47,12 @@ public class IMOkScreen extends MainScreen {
 		};
 		okButton.setChangeListener(new FieldChangeListener() {
 			public void fieldChanged(Field field, int context) {
-				mMessageEdit.setText(IMOK_MSG);
+				mOKStatusField.setText("I'm OK!");
+
+				if (!mIsMessageEdited || mMessageEdit.getText() == IMOK_MSG || mMessageEdit.getText() == HELP_MSG) {
+					mMessageEdit.setText(IMOK_MSG);
+				}
+				mIsOkay = true;
 			}
 		});
 		//okButton.setFont(okButton.getFont().derive(Font.PLAIN, 20));
@@ -67,7 +77,11 @@ public class IMOkScreen extends MainScreen {
 		};
 		helpButton.setChangeListener(new FieldChangeListener() {
 			public void fieldChanged(Field field, int context) {
-				mMessageEdit.setText(HELP_MSG);	
+				mOKStatusField.setText("I Need Help!");
+				if (!mIsMessageEdited || mMessageEdit.getText() == IMOK_MSG || mMessageEdit.getText() == HELP_MSG) {
+					mMessageEdit.setText(HELP_MSG);
+				}
+				mIsOkay = false;
 			}
 		});
 		//helpButton.setFont(helpButton.getFont().derive(Font.PLAIN, 20));
@@ -77,15 +91,29 @@ public class IMOkScreen extends MainScreen {
 		mOKButtonsManager.add(btwnButtons);
 		mOKButtonsManager.add(helpButton);
 		
+		mOKStatusField = new LabelField("", Field.FIELD_HCENTER);
+
+		HorizontalFieldManager charCountManager = new HorizontalFieldManager(Field.FIELD_HCENTER) {
+			protected void sublayout(int width, int height) {  
+				if (getFieldCount() > 0) {  
+					Field centeredField = getField(0);  // get the first (and only) field  
+					layoutChild(centeredField, width, height); // set the field's width and height  
+					setPositionChild(centeredField, (int)(width * .82), 0);  // center the field horizontally  
+					setExtent(width, centeredField.getHeight());  // set the size of this manager to use the entire screen width  
+				}  
+			} 
+		};
+		mCharCountLabel = new LabelField(Integer.toString(MAX_SMS_LEN), Field.FIELD_RIGHT);
+		charCountManager.add(mCharCountLabel);
 		
-		mCharCountLabel = new LabelField(Integer.toString(MAX_SMS_LEN));
-		mMessageEdit = new AutoTextEditField("", "", MAX_SMS_LEN, Field.FIELD_HCENTER) {
+		
+		mMessageEdit = new BasicEditField("", "", MAX_SMS_LEN, Field.FIELD_HCENTER) {
 			/*
 			public int getPreferredWidth() {
 				return 200;
 			}
 			public int getPreferredHeight() {
-				return 50;
+				return 30;
 			}
 			*/
             public void paint(Graphics g) {
@@ -102,8 +130,16 @@ public class IMOkScreen extends MainScreen {
 		};
 		mMessageEdit.setChangeListener(new FieldChangeListener() {
 			public void fieldChanged(Field field, int context) {
+				mIsMessageEdited = true;
 				int messageLen = MAX_SMS_LEN - mMessageEdit.getTextLength();
+				if (mIsOkay) {
+					messageLen = messageLen - 6;
+				}
+				else {
+					messageLen = messageLen - 10;
+				}
 				mCharCountLabel.setText(Integer.toString(messageLen));
+				mMessageEdit.setMaxSize(messageLen);
 			}
 		});
 
@@ -120,7 +156,14 @@ public class IMOkScreen extends MainScreen {
 		};
 		sendButton.setChangeListener(new FieldChangeListener() {
 			public void fieldChanged(Field field, int context) {
-				IMOkSMS sms = new IMOkSMS(SMS_ADDR, mMessageEdit.getText());
+				String messageText = mMessageEdit.getText();
+				if (mIsOkay) {
+					messageText.concat(" #imok");
+				}
+				else {
+					messageText.concat(" #needhelp");
+				}
+				IMOkSMS sms = new IMOkSMS(SMS_ADDR, messageText);
 				sms.send();
 			}
 		});
@@ -130,9 +173,11 @@ public class IMOkScreen extends MainScreen {
 		add(new LabelField());
 		add(mOKButtonsManager);
 		add(new LabelField());
+		add(mOKStatusField);
 
 		add(mMessageEdit);
-		add(mCharCountLabel);
+		add(charCountManager);
+		//add(mCharCountLabel);
 		add(sendButton);
 	}
 	

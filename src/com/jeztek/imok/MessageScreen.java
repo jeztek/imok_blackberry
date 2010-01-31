@@ -15,16 +15,17 @@ import net.rim.device.api.ui.container.MainScreen;
 public class MessageScreen extends MainScreen {
 
 	private static final int MAX_SMS_LEN = 140;
-	private static final String SMS_ADDR = "sms://6507931323";
+	private static final String SMS_ADDR = "sms://6504171034";
 
-	public static final String OK_HASH = "#imok";
-	public static final String HELP_HASH = "#needhelp";
+	public static final String OKAY_HASH = " #imok";
+	public static final String HELP_HASH = " #needhelp";
 	
 	public static final String OKAY_TEXT = "I'm okay";
 	public static final String HELP_TEXT = "I need help";
+	public static final String SENT_TEXT = "Message sent!";
 
-	public static final String OKAY_PROMPT = "Glad you're okay!  Add a message and tell us where you are with \"#loc <location>\":";
-	public static final String HELP_PROMPT = "Add a message describing your needs and tell us where you are with \"#loc <location>\":";
+	public static final String OKAY_PROMPT = "Glad you're okay!  Add a message and tell us where you are by adding \"#loc <location>\".";
+	public static final String HELP_PROMPT = "Add a message describing your needs and tell us where you are by adding \"#loc <location>\".";
 	
 	private boolean mIsOkay;
 	
@@ -40,12 +41,12 @@ public class MessageScreen extends MainScreen {
 		String title = mIsOkay ? OKAY_TEXT : HELP_TEXT;
 		setTitle(new LabelField(IMOk.APP_NAME + " - " + title, LabelField.ELLIPSIS | LabelField.USE_ALL_WIDTH));
 		
-		LabelField spacerLabel = new LabelField() {
+		LabelField promptSpacerLabel = new LabelField() {
 			public int getPreferredHeight() {
 				return 50;
 			}
 		};
-		
+				
 		String prompt = mIsOkay ? OKAY_PROMPT : HELP_PROMPT;
 		LabelField promptLabel = new LabelField(prompt, LabelField.FIELD_HCENTER) {
 			protected void layout(int width, int height)
@@ -55,6 +56,12 @@ public class MessageScreen extends MainScreen {
 			}
 		};
 		
+		LabelField messageSpacerLabel = new LabelField() {
+			public int getPreferredHeight() {
+				return 50;
+			}
+		};
+
 		HorizontalFieldManager charCountManager = new HorizontalFieldManager(Field.FIELD_HCENTER) {
 			protected void sublayout(int width, int height) {  
 				if (getFieldCount() > 0) {  
@@ -92,9 +99,13 @@ public class MessageScreen extends MainScreen {
 			public void fieldChanged(Field field, int context) {
 				int messageLen = getMessageLen();
 				mCharCountLabel.setText(Integer.toString(messageLen));
-				mMessageEdit.setMaxSize(messageLen);
 			}
 		});
+		if (mIsOkay) 
+			mMessageEdit.setMaxSize(MAX_SMS_LEN - OKAY_HASH.length());
+		else
+			mMessageEdit.setMaxSize(MAX_SMS_LEN - HELP_HASH.length());
+
 		
 		// Send button
 		ButtonField sendButton = new ButtonField("Send message", ButtonField.CONSUME_CLICK | Field.FIELD_HCENTER) {
@@ -111,26 +122,31 @@ public class MessageScreen extends MainScreen {
 			public void fieldChanged(Field field, int context) {
 				String messageText = mMessageEdit.getText();
 				if (mIsOkay) {
-					messageText += " " + OK_HASH;
+					messageText += OKAY_HASH;
 				}
 				else {
-					messageText += " " + HELP_HASH;
+					messageText += HELP_HASH;
 				}
 				IMOkSMS sms = new IMOkSMS(SMS_ADDR, messageText);
+				sms.setCompleteRunnable(new Runnable() {
+					public void run() {
+						Dialog.alert(SENT_TEXT);
+						System.exit(0);
+					}
+				});
 				sms.send();
 				mStatusLabel.setText(messageText);
 			}
 		});
 		//sendButton.setFont(helpButton.getFont().derive(Font.PLAIN, 20));
 
-		add(spacerLabel);
+		add(promptSpacerLabel);
 		add(promptLabel);
-		//add(spacerLabel);
+		add(messageSpacerLabel);
 		add(mMessageEdit);
 		add(charCountManager);
 		add(sendButton);
-
-		add(mStatusLabel);
+		//add(mStatusLabel);
 	}
 	
 	private int getMessageLen() {
@@ -141,7 +157,7 @@ public class MessageScreen extends MainScreen {
 			textLen = mMessageEdit.getTextLength();
 		
 		if (mIsOkay) {
-			return MAX_SMS_LEN - OK_HASH.length() - textLen;
+			return MAX_SMS_LEN - OKAY_HASH.length() - textLen;
 		}
 		return MAX_SMS_LEN - HELP_HASH.length() - textLen;
 	}

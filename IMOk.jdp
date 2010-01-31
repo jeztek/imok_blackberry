@@ -19,11 +19,13 @@ AutoRestart=0
 ]
 [DependsOn
 ]
+Description=Notify your friends and family in the event of an emergency.
 ExcludeFromBuildAll=0
 [Files
 src\com\jeztek\imok\IMOk.java
 src\com\jeztek\imok\IMOkScreen.java
 src\com\jeztek\imok\IMOkSMS.java
+src\com\jeztek\imok\logo.png
 src\com\jeztek\imok\MessageScreen.java
 ]
 HaveAlxImports=0
@@ -49,4 +51,5 @@ SystemModule=0
 Title=IMOk
 Type=0
 UserData=|src
-Version=1.0.2
+Vendor=IMOk
+Version=1.0.3

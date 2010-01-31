@@ -6,10 +6,14 @@ import javax.microedition.io.Connector;
 import javax.wireless.messaging.MessageConnection;
 import javax.wireless.messaging.TextMessage;
 
+import net.rim.device.api.system.Application;
+
 public class IMOkSMS {
 	
 	private String mAddress;
 	private String mMessage;
+	
+	private Runnable mSentRunnable;
 	
 	private Thread mSMSThread;
 	private Runnable mSMSTask = new Runnable() {
@@ -24,6 +28,7 @@ public class IMOkSMS {
 
 				smsConnection.send(textMessage);
 				smsConnection.close();
+				Application.getApplication().invokeLater(mSentRunnable);
 			}
 			catch (IOException e) {
 			}
@@ -38,5 +43,9 @@ public class IMOkSMS {
 	public void send() {
 		mSMSThread = new Thread(mSMSTask);
 		mSMSThread.start();
+	}
+	
+	public void setCompleteRunnable(Runnable r) {
+		mSentRunnable = r;
 	}
 }

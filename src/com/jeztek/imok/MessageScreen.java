@@ -15,7 +15,7 @@ import net.rim.device.api.ui.container.MainScreen;
 public class MessageScreen extends MainScreen {
 
 	private static final int MAX_SMS_LEN = 140;
-	private static final String SMS_ADDR = "sms://6504171034";
+	private static final String SMS_ADDR = "sms://6505555555";
 
 	public static final String OKAY_HASH = " #imok";
 	public static final String HELP_HASH = " #needhelp";

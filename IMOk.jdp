@@ -27,6 +27,7 @@ src\com\jeztek\imok\IMOkScreen.java
 src\com\jeztek\imok\IMOkSMS.java
 src\com\jeztek\imok\logo.png
 src\com\jeztek\imok\MessageScreen.java
+src\com\jeztek\imok\SettingsScreen.java
 ]
 HaveAlxImports=0
 HaveDefs=0

@@ -50,7 +50,7 @@ public class IMOkScreen extends MainScreen {
 		};
 		okButton.setChangeListener(new FieldChangeListener() {
 			public void fieldChanged(Field field, int context) {
-				nextScreen(true);
+				nextScr(true);
 			}
 		});
 		//okButton.setFont(okButton.getFont().derive(Font.PLAIN, 20));
@@ -75,7 +75,7 @@ public class IMOkScreen extends MainScreen {
 		};
 		helpButton.setChangeListener(new FieldChangeListener() {
 			public void fieldChanged(Field field, int context) {
-				nextScreen(false);
+				nextScr(false);
 			}
 		});
 		//helpButton.setFont(helpButton.getFont().derive(Font.PLAIN, 20));
@@ -92,26 +92,33 @@ public class IMOkScreen extends MainScreen {
 		add(buttonsManager);
 	}
 	
-	protected void nextScreen(boolean isOkay) {
+	protected void nextScr(boolean isOkay) {
 		MessageScreen messageScreen = new MessageScreen(isOkay);
 		UiApplication.getUiApplication().pushScreen(messageScreen);
 	}
 	
 	protected void makeMenu(Menu menu, int instance) {
-		MenuItem aboutMenuItem = new MenuItem("About", 10, 20) {
+		MenuItem aboutMenuItem = new MenuItem("About", 10, 30) {
 			public void run() {
 				Dialog.alert(IMOk.ABOUT_TEXT);
 			}
 		};
 
-		MenuItem closeMenuItem = new MenuItem("Close", 20, 10) {
+		MenuItem settingsMenuItem = new MenuItem("Settings", 20, 20) {
+			public void run() {
+				UiApplication.getUiApplication().pushScreen(new SettingsScreen());
+			}
+		};
+
+		MenuItem closeMenuItem = new MenuItem("Close", 30, 10) {
 			public void run() {
 				onClose();
 			}
 		};
-		
+				
 		menu.add(closeMenuItem);
 		menu.add(aboutMenuItem);
+		menu.add(settingsMenuItem);
 	}
 	
 	public boolean onClose() {

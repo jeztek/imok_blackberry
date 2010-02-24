@@ -1,5 +1,7 @@
 package com.jeztek.imok;
 
+import net.rim.device.api.system.PersistentObject;
+import net.rim.device.api.system.PersistentStore;
 import net.rim.device.api.ui.Field;
 import net.rim.device.api.ui.FieldChangeListener;
 import net.rim.device.api.ui.Graphics;
@@ -15,7 +17,6 @@ import net.rim.device.api.ui.container.MainScreen;
 public class MessageScreen extends MainScreen {
 
 	private static final int MAX_SMS_LEN = 140;
-	private static final String SMS_ADDR = "sms://6505555555";
 
 	public static final String OKAY_HASH = " #imok";
 	public static final String HELP_HASH = " #needhelp";
@@ -27,6 +28,8 @@ public class MessageScreen extends MainScreen {
 	public static final String OKAY_PROMPT = "Glad you're okay!  Add a message and tell us where you are by adding \"#loc <location>\".";
 	public static final String HELP_PROMPT = "Add a message describing your needs and tell us where you are by adding \"#loc <location>\".";
 	
+	public static PersistentObject persist;
+
 	private boolean mIsOkay;
 	
 	private BasicEditField mMessageEdit;
@@ -127,7 +130,15 @@ public class MessageScreen extends MainScreen {
 				else {
 					messageText += HELP_HASH;
 				}
-				IMOkSMS sms = new IMOkSMS(SMS_ADDR, messageText);
+				
+				persist = PersistentStore.getPersistentObject(SettingsScreen.PERSIST_KEY);
+				String smsAddr = (String)persist.getContents();
+				if (smsAddr == null) {
+					smsAddr = SettingsScreen.SMS_ADDR;
+					persist.setContents(smsAddr);
+					persist.commit();
+				}
+				IMOkSMS sms = new IMOkSMS("sms://" + smsAddr, messageText);
 				sms.setCompleteRunnable(new Runnable() {
 					public void run() {
 						Dialog.alert(SENT_TEXT);
